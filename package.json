@@ -5,6 +5,7 @@
   "version": "2.3.3",
   "homepage": "https://github.com/artegoser/neotp",
   "license": "MIT",
+  "types": "types.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/artegoser/neotp.git"
