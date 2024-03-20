@@ -1,25 +1,26 @@
 {
-  "author": "d-band",
-  "name": "botp",
-  "description": "Browser One Time Password library, supports HOTP, TOTP and works with Google Authenticator",
-  "version": "2.3.2",
-  "homepage": "https://github.com/d-band/botp",
+  "author": "artegoser",
+  "name": "neotp",
+  "description": "New node/browser One Time Password library, supports HOTP, TOTP and works with Google Authenticator ",
+  "version": "2.3.3",
+  "homepage": "https://github.com/artegoser/neotp",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/d-band/botp.git"
+    "url": "git://github.com/artegoser/neotp.git"
   },
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha"
+    "test": "mocha"
   },
   "engines": {
-    "node": "> v0.6.0"
+    "node": ">=18"
   },
   "dependencies": {
     "base32.js": "^0.1.0",
-    "crypto-js": "^3.1.9-1"
+    "crypto-js": "^4.2.0"
   },
   "devDependencies": {
-    "mocha": "^3.2.0"
+    "mocha": "^10.3.0"
   }
 }

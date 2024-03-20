@@ -1,13 +1,15 @@
-var base32 = require('../base32');
-var assert = require('assert');
+let base32 = require("../base32");
+let assert = require("assert");
 
-var key = '12345678901234567890';
-var value = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+let key = "12345678901234567890";
+let value = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
 
-exports.testEncode = function() {
-  assert.equal(base32.encode(key), value, 'Should be encode');
-}
+describe("Base32", () => {
+  it("Encode", () => {
+    assert.equal(base32.encode(key), value);
+  });
 
-exports.testDecode = function() {
-  assert.equal(base32.decode(value), key, 'Should be decode');
-}
+  it("Decode", () => {
+    assert.equal(base32.decode(value), key);
+  });
+});
