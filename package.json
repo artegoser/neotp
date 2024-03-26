@@ -13,7 +13,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "nyc ./node_modules/.bin/_mocha 'dist/test/**/*.test.js'",
+    "test": "npm run build && mocha 'dist/test/**/*.test.js'",
     "build": "tsc"
   },
   "engines": {
@@ -24,13 +24,10 @@
     "crypto-js": "^4.2.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.14",
     "@types/crypto-js": "^4.2.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.30",
-    "chai": "^5.1.0",
     "mocha": "^10.3.0",
-    "nyc": "^15.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   }
