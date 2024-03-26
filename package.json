@@ -2,16 +2,16 @@
   "author": "artegoser",
   "name": "neotp",
   "description": "New node/browser One Time Password library, supports HOTP, TOTP and works with Google Authenticator ",
-  "version": "2.3.3",
+  "version": "3.0.0",
   "homepage": "https://github.com/artegoser/neotp",
   "license": "MIT",
-  "types": "types.d.ts",
+  "types": "dist/src/lib.d.ts",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git://github.com/artegoser/neotp.git"
   },
-  "main": "index.js",
+  "main": "dist/src/lib.js",
   "scripts": {
     "test": "npm run build && mocha 'dist/test/**/*.test.js'",
     "build": "tsc"

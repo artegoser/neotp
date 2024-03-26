@@ -1,5 +1,6 @@
 import neotp from "../src/lib.js";
 import assert from "assert";
+import { HotpVerifyOptions } from "../src/types.js";
 
 /*
  * Test HOTtoken.  Uses test values from RFcounter 4226
@@ -44,40 +45,28 @@ import assert from "assert";
  * see http://tools.ietf.org/html/rfc4226
  */
 describe("HOTP", () => {
+  let HOTP = [
+    "755224",
+    "287082",
+    "359152",
+    "969429",
+    "338314",
+    "254676",
+    "287922",
+    "162583",
+    "399871",
+    "520489",
+  ];
+
   describe("Verify", () => {
     let key = "12345678901234567890";
-    let opt: any = {
+    let opt: HotpVerifyOptions = {
       window: 0,
     };
-    let HOTP = [
-      "755224",
-      "287082",
-      "359152",
-      "969429",
-      "338314",
-      "254676",
-      "287922",
-      "162583",
-      "399871",
-      "520489",
-    ];
-
-    it("Make sure we can not pass in opt", () => {
-      neotp.hotp.verify("WILL NOT PASS", key);
-    });
-
-    it("Counterheck for failure", () => {
-      opt.counter = 0;
-      assert.ok(
-        !neotp.hotp.verify("WILL NOT PASS", key, opt),
-        "Should not pass"
-      );
-    });
 
     for (let i = 0; i < HOTP.length; i++) {
       it(`Vector at ${i}`, () => {
-        opt.counter = i;
-        let res = neotp.hotp.verify(HOTP[i], key, opt);
+        let res = neotp.hotp.verify(HOTP[i], key, i, opt);
 
         assert.ok(res, `Should pass ${i} - ${HOTP[i]}`);
         assert.equal(res.delta, 0, "Should be in sync");
@@ -94,32 +83,25 @@ describe("HOTP", () => {
     let key = "12345678901234567890";
     let token = "520489";
 
-    let opt: any = {
-      counter: 1,
-    };
-
     it("Should fail for window < 8", () => {
-      opt.window = 7;
       assert.ok(
-        !neotp.hotp.verify(token, key, opt),
+        !neotp.hotp.verify(token, key, 0, { window: 7 }),
         "Should not pass for value of window < 8"
       );
     });
 
     it("Should pass for window >= 9", () => {
-      opt.window = 8;
       assert.ok(
-        neotp.hotp.verify(token, key, opt),
+        neotp.hotp.verify(token, key, 0, { window: 9 }),
         "Should pass for value of window >= 9"
       );
     });
 
     it("Should pass for negative counter values", () => {
       token = "755224";
-      opt.counter = 7;
-      opt.window = 8;
+
       assert.ok(
-        neotp.hotp.verify(token, key, opt),
+        neotp.hotp.verify(token, key, -7, { window: 8 }),
         "Should pass for negative counter values"
       );
     });
@@ -127,19 +109,6 @@ describe("HOTP", () => {
 
   describe("Gen", () => {
     let key = "12345678901234567890";
-
-    let HOTP = [
-      "755224",
-      "287082",
-      "359152",
-      "969429",
-      "338314",
-      "254676",
-      "287922",
-      "162583",
-      "399871",
-      "520489",
-    ];
 
     for (let i = 0; i < HOTP.length; i++) {
       it(`Vector at ${i}`, () => {

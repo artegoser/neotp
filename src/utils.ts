@@ -1,7 +1,5 @@
 /**
  * convert an integer to a byte array
- * @param {Integer} num
- * @return {Array} bytes
  */
 function intToWords(num: number) {
   let bytes = [];
@@ -18,8 +16,6 @@ function intToWords(num: number) {
 
 /**
  * convert a hex value to a byte array
- * @param {String} hex string of hex to convert to a byte array
- * @return {Array} bytes
  */
 function hexToBytes(hex: string) {
   let bytes = [];
