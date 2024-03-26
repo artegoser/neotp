@@ -1,19 +1,15 @@
-import { HotpVerifyOptions } from "./types.js";
+import { HotpGenOptions, HotpVerifyOptions } from "./types.js";
 import { hmac } from "./utils.js";
 
 /**
  * Generate a counter based One Time Password
  */
-export async function gen(key: string, counter: number) {
-  // // Create the byte array
-  // let b = intToWords(counter);
-  // // Update the HMAC with the byte array
-  // let digest = HmacSHA1(WordArray.create(b), key).toString();
-
-  // // Get byte array
-  // let h = hexToBytes(digest);
-
-  let h = await hmac(key, counter);
+export async function gen(
+  key: string,
+  counter: number,
+  { _hash: hash = "SHA-1" }: HotpGenOptions = {}
+) {
+  let h = await hmac(key, counter, hash);
 
   // Truncate
   let offset = h[19] & 0xf;
@@ -34,12 +30,12 @@ export async function verify(
   token: string,
   key: string,
   counter: number,
-  { window = 50 }: HotpVerifyOptions = {}
+  { window = 50, _hash: hash = "SHA-1" }: HotpVerifyOptions = {}
 ) {
   // Now loop through from C to C + W to determine if there is
   // a correct code
   for (let i = counter - window; i <= counter + window; ++i) {
-    if ((await gen(key, i)) === token) {
+    if ((await gen(key, i, { _hash: hash })) === token) {
       // We have found a matching code, trigger callback
       // and pass offset
       return {

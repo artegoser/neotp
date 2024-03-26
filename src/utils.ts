@@ -13,23 +13,21 @@ function intToBytes(num: number) {
 }
 
 export async function hmac(
-  secret: string,
+  key: string,
   counter: number,
-  hash: "SHA-512" | "SHA-256" | "SHA-1" = "SHA-1"
+  hash: "SHA-512" | "SHA-384" | "SHA-256" | "SHA-1" = "SHA-1"
 ) {
-  const algorithm = { name: "HMAC", hash };
-
-  const key = await crypto.subtle.importKey(
+  const hkey = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(secret),
-    algorithm,
+    new TextEncoder().encode(key),
+    { name: "HMAC", hash },
     false,
     ["sign", "verify"]
   );
 
   const signature = await crypto.subtle.sign(
-    algorithm.name,
-    key,
+    "HMAC",
+    hkey,
     new Uint8Array(intToBytes(counter))
   );
 

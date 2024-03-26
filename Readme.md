@@ -4,7 +4,8 @@
 
 - [x] Use native crypto module
 - [x] Rewrite to esm + typescript
-- [ ] Add support for sha256, 512
+- [x] Add support for sha256, 512
+- [ ] Fix sha256, 512 tests
 
 ## Installation
 

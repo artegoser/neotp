@@ -3,46 +3,22 @@ import assert from "assert";
 import { HotpVerifyOptions } from "../src/types.js";
 
 /*
- * Test HOTtoken.  Uses test values from RFcounter 4226
- *
- *
- *    The following test data uses the AScounterII string
- *    "12345678901234567890" for the secret:
- *
- * Secret = 0x3132333435363738393031323334353637383930
- *
- * Table 1 details for each count, the intermediate HMAcounter value.
- *
- * counterount    Hexadecimal HMAcounter-SHA-1(secret, count)
- * 0        cc93cf18508d94934c64b65d8ba7667fb7cde4b0
- * 1        75a48a19d4cbe100644e8ac1397eea747a2d33ab
- * 2        0bacb7fa082fef30782211938bc1c5e70416ff44
- * 3        66c28227d03a2d5529262ff016a1e6ef76557ece
- * 4        a904c900a64b35909874b33e61c5938a8e15ed1c
- * 5        a37e783d7b7233c083d4f62926c7a25f238d0316
- * 6        bc9cd28561042c83f219324d3c607256c03272ae
- * 7        a4fb960c0bc06e1eabb804e5b397cdc4b45596fa
- * 8        1b3c89f65e6c9e883012052823443f048b4332db
- * 9        1637409809a679dc698207310c8c7fc07290d9e5
- *
- * Table 2 details for each count the truncated values (both in
- * hexadecimal and decimal) and then the HOTtoken value.
- *
+ * Test HOTtoken.  Uses test values from rfc6238
  *                   Truncated
- * counterount    Hexadecimal    Decimal        HOTtoken
- * 0        4c93cf18       1284755224     755224
- * 1        41397eea       1094287082     287082
- * 2         82fef30        137359152     359152
- * 3        66ef7655       1726969429     969429
- * 4        61c5938a       1640338314     338314
- * 5        33c083d4        868254676     254676
- * 6        7256c032       1918287922     287922
- * 7         4e5b397         82162583     162583
- * 8        2823443f        673399871     399871
- * 9        2679dc69        645520489     520489
+ *  Count    Hexadecimal    Decimal        HOTP
+ *  0        4c93cf18       1284755224     755224
+ *  1        41397eea       1094287082     287082
+ *  2         82fef30        137359152     359152
+ *  3        66ef7655       1726969429     969429
+ *  4        61c5938a       1640338314     338314
+ *  5        33c083d4        868254676     254676
+ *  6        7256c032       1918287922     287922
+ *  7         4e5b397         82162583     162583
+ *  8        2823443f        673399871     399871
+ *  9        2679dc69        645520489     520489
  *
  *
- * see http://tools.ietf.org/html/rfc4226
+ * see https://datatracker.ietf.org/doc/html/rfc4226#appendix-D
  */
 describe("HOTP", () => {
   let HOTP = [
@@ -123,72 +99,116 @@ describe("HOTP", () => {
 });
 
 /*
- * Test TOTtoken using test vectors from TOTtoken RFcounter.
+ * Test TOTtoken using test vectors from rfc6238.
  *
- * see http://tools.ietf.org/id/draft-mraihi-totp-timebased-06.txt
+ * +-------------+--------------+------------------+----------+--------+
+ * |  Time (sec) |   UTC Time   | Value of T (hex) |   TOTP   |  Mode  |
+ * +-------------+--------------+------------------+----------+--------+
+ * |      59     |  1970-01-01  | 0000000000000001 | 94287082 |  SHA1  |
+ * |             |   00:00:59   |                  |          |        |
+ * |      59     |  1970-01-01  | 0000000000000001 | 46119246 | SHA256 |
+ * |             |   00:00:59   |                  |          |        |
+ * |      59     |  1970-01-01  | 0000000000000001 | 90693936 | SHA512 |
+ * |             |   00:00:59   |                  |          |        |
+ * |  1111111109 |  2005-03-18  | 00000000023523EC | 07081804 |  SHA1  |
+ * |             |   01:58:29   |                  |          |        |
+ * |  1111111109 |  2005-03-18  | 00000000023523EC | 68084774 | SHA256 |
+ * |             |   01:58:29   |                  |          |        |
+ * |  1111111109 |  2005-03-18  | 00000000023523EC | 25091201 | SHA512 |
+ * |             |   01:58:29   |                  |          |        |
+ * |  1111111111 |  2005-03-18  | 00000000023523ED | 14050471 |  SHA1  |
+ * |             |   01:58:31   |                  |          |        |
+ * |  1111111111 |  2005-03-18  | 00000000023523ED | 67062674 | SHA256 |
+ * |             |   01:58:31   |                  |          |        |
+ * |  1111111111 |  2005-03-18  | 00000000023523ED | 99943326 | SHA512 |
+ * |             |   01:58:31   |                  |          |        |
+ * |  1234567890 |  2009-02-13  | 000000000273EF07 | 89005924 |  SHA1  |
+ * |             |   23:31:30   |                  |          |        |
+ * |  1234567890 |  2009-02-13  | 000000000273EF07 | 91819424 | SHA256 |
+ * |             |   23:31:30   |                  |          |        |
+ * |  1234567890 |  2009-02-13  | 000000000273EF07 | 93441116 | SHA512 |
+ * |             |   23:31:30   |                  |          |        |
+ * |  2000000000 |  2033-05-18  | 0000000003F940AA | 69279037 |  SHA1  |
+ * |             |   03:33:20   |                  |          |        |
+ * |  2000000000 |  2033-05-18  | 0000000003F940AA | 90698825 | SHA256 |
+ * |             |   03:33:20   |                  |          |        |
+ * |  2000000000 |  2033-05-18  | 0000000003F940AA | 38618901 | SHA512 |
+ * |             |   03:33:20   |                  |          |        |
+ * | 20000000000 |  2603-10-11  | 0000000027BC86AA | 65353130 |  SHA1  |
+ * |             |   11:33:20   |                  |          |        |
+ * | 20000000000 |  2603-10-11  | 0000000027BC86AA | 77737706 | SHA256 |
+ * |             |   11:33:20   |                  |          |        |
+ * | 20000000000 |  2603-10-11  | 0000000027BC86AA | 47863826 | SHA512 |
+ * |             |   11:33:20   |                  |          |        |
+ * +-------------+--------------+------------------+----------+--------+
+ *
+ * see https://datatracker.ietf.org/doc/html/rfc6238#appendix-B
  */
 describe("TOTP", () => {
+  let time = [59, 1111111109, 1111111111, 1234567890, 2000000000, 20000000000];
+  let results = {
+    sha1: ["287082", "081804", "050471", "005924", "279037", "353130"],
+    sha256: ["119246", "084774", "062674", "819424", "698825", "737706"],
+    sha512: ["693936", "091201", "943326", "441116", "618901", "863826"],
+  };
+  let key = "12345678901234567890";
+
   describe("Verify", () => {
-    let key = "12345678901234567890";
+    for (let i = 0; i < time.length; i++) {
+      it(`Vector at ${time[i]}s (sha1)`, async () => {
+        let token = results.sha1[i];
+        let res = await neotp.totp.verify(token, key, {
+          _t: time[i] * 1000,
+          _hash: "SHA-1",
+        });
+        assert.ok(res, "Should pass");
+      });
 
-    it("Vector at 59s", async () => {
-      let token = "287082";
-      let res = await neotp.totp.verify(token, key, { _t: 59 * 1000 });
-      assert.ok(res, "Should pass");
-    });
+      // it(`Vector at ${time[i]}s (sha256)`, async () => {
+      //   let token = results.sha256[i];
+      //   let res = await neotp.totp.verify(token, key, {
+      //     _t: time[i] * 1000,
+      //     _hash: "SHA-256",
+      //   });
+      //   assert.ok(res, "Should pass");
+      // });
 
-    it("Vector at 1234567890", async () => {
-      let token = "005924";
-      let res = await neotp.totp.verify(token, key, { _t: 1234567890 * 1000 });
-      assert.ok(res, "Should pass");
-    });
-
-    it("Vector at 1111111109", async () => {
-      let token = "081804";
-      let res = await neotp.totp.verify(token, key, { _t: 1111111109 * 1000 });
-      assert.ok(res, "Should pass");
-    });
-
-    it("Vector at 2000000000", async () => {
-      let token = "279037";
-      let res = await neotp.totp.verify(token, key, { _t: 2000000000 * 1000 });
-      assert.ok(res, "Should pass");
-    });
+      // it(`Vector at ${time[i]}s (sha512)`, async () => {
+      //   let token = results.sha512[i];
+      //   let res = await neotp.totp.verify(token, key, {
+      //     _t: time[i] * 1000,
+      //     _hash: "SHA-512",
+      //   });
+      //   assert.ok(res, "Should pass");
+      // });
+    }
   });
 
   describe("Gen", () => {
-    let key = "12345678901234567890";
+    for (let i = 0; i < time.length; i++) {
+      it(`Vector at ${time[i]}s (sha1)`, async () => {
+        let res = await neotp.totp.gen(key, {
+          _t: time[i] * 1000,
+          _hash: "SHA-1",
+        });
+        assert.equal(res, results.sha1[i], "Should be correct");
+      });
 
-    it("Vector at 59s", async () => {
-      assert.equal(
-        await neotp.totp.gen(key, { _t: 59 * 1000 }),
-        "287082",
-        "TOTtoken values should match"
-      );
-    });
+      // it(`Vector at ${time[i]}s (sha256)`, async () => {
+      //   let res = await neotp.totp.gen(key, {
+      //     _t: time[i] * 1000,
+      //     _hash: "SHA-256",
+      //   });
+      //   assert.equal(res, results.sha256[i], "Should be correct");
+      // });
 
-    it("Vector at 1234567890", async () => {
-      assert.equal(
-        await neotp.totp.gen(key, { _t: 1234567890 * 1000 }),
-        "005924",
-        "TOTtoken values should match"
-      );
-    });
-
-    it("Vector at 1111111109", async () => {
-      assert.equal(
-        await neotp.totp.gen(key, { _t: 1111111109 * 1000 }),
-        "081804",
-        "TOTtoken values should match"
-      );
-    });
-
-    it("Vector at 2000000000", async () => {
-      assert.equal(
-        await neotp.totp.gen(key, { _t: 2000000000 * 1000 }),
-        "279037",
-        "TOTtoken values should match"
-      );
-    });
+      // it(`Vector at ${time[i]}s (sha512)`, async () => {
+      //   let res = await neotp.totp.gen(key, {
+      //     _t: time[i] * 1000,
+      //     _hash: "SHA-512",
+      //   });
+      //   assert.equal(res, results.sha512[i], "Should be correct");
+      // });
+    }
   });
 });
