@@ -1,0 +1,8 @@
+{
+  "extends": "@istanbuljs/nyc-config-javascript",
+  "include": ["dist/src/**/*.js"],
+  "exclude": ["node_modules/"],
+  "extension": [".js"],
+  "reporter": ["text-summary", "html"],
+  "report-dir": "./coverage"
+}

@@ -1,5 +1,5 @@
-let neotp = require("..");
-let assert = require("assert");
+import * as neotp from "../src/lib.js";
+import assert from "assert";
 
 /*
  * Test HOTtoken.  Uses test values from RFcounter 4226
@@ -46,7 +46,7 @@ let assert = require("assert");
 describe("HOTP", () => {
   describe("Verify", () => {
     let key = "12345678901234567890";
-    let opt = {
+    let opt: any = {
       window: 0,
     };
     let HOTP = [
@@ -94,7 +94,7 @@ describe("HOTP", () => {
     let key = "12345678901234567890";
     let token = "520489";
 
-    let opt = {
+    let opt: any = {
       counter: 1,
     };
 
@@ -127,7 +127,7 @@ describe("HOTP", () => {
 
   describe("Gen", () => {
     let key = "12345678901234567890";
-    let opt = {
+    let opt: any = {
       window: 0,
     };
 
@@ -169,7 +169,7 @@ describe("HOTP", () => {
 describe("TOTP", () => {
   describe("Verify", () => {
     let key = "12345678901234567890";
-    let opt = {
+    let opt: any = {
       window: 0,
     };
 
@@ -226,7 +226,7 @@ describe("TOTP", () => {
     let key = "12345678901234567890";
     let token = "279037";
 
-    let opt = {
+    let opt: any = {
       _t: 1999999909 * 1000,
     };
 
@@ -249,7 +249,7 @@ describe("TOTP", () => {
 
   describe("Gen", () => {
     let key = "12345678901234567890";
-    let opt = {
+    let opt: any = {
       window: 0,
     };
 
