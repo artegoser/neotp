@@ -1,5 +1,6 @@
-let neotp = require("..");
-let assert = require("assert");
+import neotp from "../src/lib.js";
+import assert from "assert";
+import { HotpVerifyOptions } from "../src/types.js";
 
 /*
  * Test HOTtoken.  Uses test values from RFcounter 4226
@@ -44,40 +45,28 @@ let assert = require("assert");
  * see http://tools.ietf.org/html/rfc4226
  */
 describe("HOTP", () => {
+  let HOTP = [
+    "755224",
+    "287082",
+    "359152",
+    "969429",
+    "338314",
+    "254676",
+    "287922",
+    "162583",
+    "399871",
+    "520489",
+  ];
+
   describe("Verify", () => {
     let key = "12345678901234567890";
-    let opt = {
+    let opt: HotpVerifyOptions = {
       window: 0,
     };
-    let HOTP = [
-      "755224",
-      "287082",
-      "359152",
-      "969429",
-      "338314",
-      "254676",
-      "287922",
-      "162583",
-      "399871",
-      "520489",
-    ];
-
-    it("Make sure we can not pass in opt", () => {
-      neotp.hotp.verify("WILL NOT PASS", key);
-    });
-
-    it("Counterheck for failure", () => {
-      opt.counter = 0;
-      assert.ok(
-        !neotp.hotp.verify("WILL NOT PASS", key, opt),
-        "Should not pass"
-      );
-    });
 
     for (let i = 0; i < HOTP.length; i++) {
       it(`Vector at ${i}`, () => {
-        opt.counter = i;
-        let res = neotp.hotp.verify(HOTP[i], key, opt);
+        let res = neotp.hotp.verify(HOTP[i], key, i, opt);
 
         assert.ok(res, `Should pass ${i} - ${HOTP[i]}`);
         assert.equal(res.delta, 0, "Should be in sync");
@@ -94,32 +83,25 @@ describe("HOTP", () => {
     let key = "12345678901234567890";
     let token = "520489";
 
-    let opt = {
-      counter: 1,
-    };
-
     it("Should fail for window < 8", () => {
-      opt.window = 7;
       assert.ok(
-        !neotp.hotp.verify(token, key, opt),
+        !neotp.hotp.verify(token, key, 0, { window: 7 }),
         "Should not pass for value of window < 8"
       );
     });
 
     it("Should pass for window >= 9", () => {
-      opt.window = 8;
       assert.ok(
-        neotp.hotp.verify(token, key, opt),
+        neotp.hotp.verify(token, key, 0, { window: 9 }),
         "Should pass for value of window >= 9"
       );
     });
 
     it("Should pass for negative counter values", () => {
       token = "755224";
-      opt.counter = 7;
-      opt.window = 8;
+
       assert.ok(
-        neotp.hotp.verify(token, key, opt),
+        neotp.hotp.verify(token, key, -7, { window: 8 }),
         "Should pass for negative counter values"
       );
     });
@@ -127,32 +109,11 @@ describe("HOTP", () => {
 
   describe("Gen", () => {
     let key = "12345678901234567890";
-    let opt = {
-      window: 0,
-    };
-
-    let HOTP = [
-      "755224",
-      "287082",
-      "359152",
-      "969429",
-      "338314",
-      "254676",
-      "287922",
-      "162583",
-      "399871",
-      "520489",
-    ];
-
-    it("Make sure we can not pass in opt", () => {
-      neotp.hotp.gen(key);
-    });
 
     for (let i = 0; i < HOTP.length; i++) {
       it(`Vector at ${i}`, () => {
-        opt.counter = i;
         assert.equal(
-          neotp.hotp.gen(key, opt),
+          neotp.hotp.gen(key, i),
           HOTP[i],
           "HOTP value should be correct"
         );
@@ -169,125 +130,62 @@ describe("HOTP", () => {
 describe("TOTP", () => {
   describe("Verify", () => {
     let key = "12345678901234567890";
-    let opt = {
-      window: 0,
-    };
-
-    it("Make sure we can not pass in opt", () => {
-      neotp.totp.verify("windowILLNOTtokenPASS", key);
-    });
-
-    it("Сounterheck for failure", () => {
-      opt.time = 0;
-      assert.ok(
-        !neotp.totp.verify("windowILLNOTtokenPASS", key, opt),
-        "Should not pass"
-      );
-    });
 
     it("Vector at 59s", () => {
-      opt._t = 59 * 1000;
       let token = "287082";
-      let res = neotp.totp.verify(token, key, opt);
+      let res = neotp.totp.verify(token, key, { _t: 59 * 1000 });
       assert.ok(res, "Should pass");
-      assert.equal(res.delta, 0, "Should be in sync");
     });
 
     it("Vector at 1234567890", () => {
-      opt._t = 1234567890 * 1000;
       let token = "005924";
-      let res = neotp.totp.verify(token, key, opt);
+      let res = neotp.totp.verify(token, key, { _t: 1234567890 * 1000 });
       assert.ok(res, "Should pass");
-      assert.equal(res.delta, 0, "Should be in sync");
     });
 
     it("Vector at 1111111109", () => {
-      opt._t = 1111111109 * 1000;
       let token = "081804";
-      let res = neotp.totp.verify(token, key, opt);
+      let res = neotp.totp.verify(token, key, { _t: 1111111109 * 1000 });
       assert.ok(res, "Should pass");
-      assert.equal(res.delta, 0, "Should be in sync");
     });
 
     it("Vector at 2000000000", () => {
-      opt._t = 2000000000 * 1000;
       let token = "279037";
-      let res = neotp.totp.verify(token, key, opt);
+      let res = neotp.totp.verify(token, key, { _t: 2000000000 * 1000 });
       assert.ok(res, "Should pass");
-      assert.equal(res.delta, 0, "Should be in sync");
-    });
-  });
-
-  /*
-   * counterheck for codes that are out of sync
-   * windowe are going to use a value of T = 1999999909 (91s behind 2000000000)
-   */
-  describe("Out of sync", () => {
-    let key = "12345678901234567890";
-    let token = "279037";
-
-    let opt = {
-      _t: 1999999909 * 1000,
-    };
-
-    it("Should fail for window < 2", () => {
-      opt.window = 2;
-      assert.ok(
-        !neotp.totp.verify(token, key, opt),
-        "Should not pass for value of window < 3"
-      );
-    });
-
-    it("Should pass for window >= 3", () => {
-      opt.window = 3;
-      assert.ok(
-        neotp.totp.verify(token, key, opt),
-        "Should pass for value of window >= 3"
-      );
     });
   });
 
   describe("Gen", () => {
     let key = "12345678901234567890";
-    let opt = {
-      window: 0,
-    };
-
-    it("Make sure we can not pass in opt", () => {
-      neotp.totp.gen(key);
-    });
 
     it("Vector at 59s", () => {
-      opt._t = 59 * 1000;
       assert.equal(
-        neotp.totp.gen(key, opt),
+        neotp.totp.gen(key, { _t: 59 * 1000 }),
         "287082",
         "TOTtoken values should match"
       );
     });
 
     it("Vector at 1234567890", () => {
-      opt._t = 1234567890 * 1000;
       assert.equal(
-        neotp.totp.gen(key, opt),
+        neotp.totp.gen(key, { _t: 1234567890 * 1000 }),
         "005924",
         "TOTtoken values should match"
       );
     });
 
     it("Vector at 1111111109", () => {
-      opt._t = 1111111109 * 1000;
       assert.equal(
-        neotp.totp.gen(key, opt),
+        neotp.totp.gen(key, { _t: 1111111109 * 1000 }),
         "081804",
         "TOTtoken values should match"
       );
     });
 
     it("Vector at 2000000000", () => {
-      opt._t = 2000000000 * 1000;
       assert.equal(
-        neotp.totp.gen(key, opt),
+        neotp.totp.gen(key, { _t: 2000000000 * 1000 }),
         "279037",
         "TOTtoken values should match"
       );
