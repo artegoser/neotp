@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Use native crypto module
+- [x] Use native crypto module
 - [x] Rewrite to esm + typescript
 - [ ] Add support for sha256, 512
 
@@ -20,10 +20,10 @@ import { totp } from "neotp";
 let key = "secret key for user... could be stored in DB";
 
 // Generate TOTP
-let token = totp.gen(key);
+let token = await totp.gen(key);
 
 // Check TOTP is correct
-let login = totp.verify(token, key);
+let login = await totp.verify(token, key);
 
 // invalid token if login is null
 if (!login) {

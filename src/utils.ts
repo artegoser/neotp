@@ -1,32 +1,37 @@
 /**
  * convert an integer to a byte array
  */
-function intToWords(num: number) {
-  let bytes = [];
-  for (let i = 7; i >= 0; --i) {
+function intToBytes(num: number) {
+  var bytes = [];
+
+  for (var i = 7; i >= 0; --i) {
     bytes[i] = num & 255;
     num = num >> 8;
   }
-  let words: number[] = [];
-  for (let i = 0; i < bytes.length; i++) {
-    words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8);
-  }
-  return words;
-}
 
-/**
- * convert a hex value to a byte array
- */
-function hexToBytes(hex: string) {
-  let bytes = [];
-  for (let c = 0, C = hex.length; c < C; c += 2) {
-    bytes.push(parseInt(hex.substr(c, 2), 16));
-  }
   return bytes;
 }
 
-import CryptoJS from "crypto-js";
-import HmacSHA1 from "crypto-js/hmac-sha1.js";
-const WordArray = CryptoJS.lib.WordArray;
+export async function hmac(
+  secret: string,
+  counter: number,
+  hash: "SHA-512" | "SHA-256" | "SHA-1" = "SHA-1"
+) {
+  const algorithm = { name: "HMAC", hash };
 
-export { intToWords, hexToBytes, HmacSHA1, WordArray };
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    algorithm,
+    false,
+    ["sign", "verify"]
+  );
+
+  const signature = await crypto.subtle.sign(
+    algorithm.name,
+    key,
+    new Uint8Array(intToBytes(counter))
+  );
+
+  return new Uint8Array(signature);
+}

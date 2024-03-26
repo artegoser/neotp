@@ -65,8 +65,8 @@ describe("HOTP", () => {
     };
 
     for (let i = 0; i < HOTP.length; i++) {
-      it(`Vector at ${i}`, () => {
-        let res = neotp.hotp.verify(HOTP[i], key, i, opt);
+      it(`Vector at ${i}`, async () => {
+        let res = await neotp.hotp.verify(HOTP[i], key, i, opt);
 
         assert.ok(res, `Should pass ${i} - ${HOTP[i]}`);
         assert.equal(res.delta, 0, "Should be in sync");
@@ -83,25 +83,25 @@ describe("HOTP", () => {
     let key = "12345678901234567890";
     let token = "520489";
 
-    it("Should fail for window < 8", () => {
+    it("Should fail for window < 8", async () => {
       assert.ok(
-        !neotp.hotp.verify(token, key, 0, { window: 7 }),
+        !(await neotp.hotp.verify(token, key, 0, { window: 7 })),
         "Should not pass for value of window < 8"
       );
     });
 
-    it("Should pass for window >= 9", () => {
+    it("Should pass for window >= 9", async () => {
       assert.ok(
-        neotp.hotp.verify(token, key, 0, { window: 9 }),
+        await neotp.hotp.verify(token, key, 0, { window: 9 }),
         "Should pass for value of window >= 9"
       );
     });
 
-    it("Should pass for negative counter values", () => {
+    it("Should pass for negative counter values", async () => {
       token = "755224";
 
       assert.ok(
-        neotp.hotp.verify(token, key, -7, { window: 8 }),
+        await neotp.hotp.verify(token, key, -7, { window: 8 }),
         "Should pass for negative counter values"
       );
     });
@@ -111,9 +111,9 @@ describe("HOTP", () => {
     let key = "12345678901234567890";
 
     for (let i = 0; i < HOTP.length; i++) {
-      it(`Vector at ${i}`, () => {
+      it(`Vector at ${i}`, async () => {
         assert.equal(
-          neotp.hotp.gen(key, i),
+          await neotp.hotp.gen(key, i),
           HOTP[i],
           "HOTP value should be correct"
         );
@@ -131,27 +131,27 @@ describe("TOTP", () => {
   describe("Verify", () => {
     let key = "12345678901234567890";
 
-    it("Vector at 59s", () => {
+    it("Vector at 59s", async () => {
       let token = "287082";
-      let res = neotp.totp.verify(token, key, { _t: 59 * 1000 });
+      let res = await neotp.totp.verify(token, key, { _t: 59 * 1000 });
       assert.ok(res, "Should pass");
     });
 
-    it("Vector at 1234567890", () => {
+    it("Vector at 1234567890", async () => {
       let token = "005924";
-      let res = neotp.totp.verify(token, key, { _t: 1234567890 * 1000 });
+      let res = await neotp.totp.verify(token, key, { _t: 1234567890 * 1000 });
       assert.ok(res, "Should pass");
     });
 
-    it("Vector at 1111111109", () => {
+    it("Vector at 1111111109", async () => {
       let token = "081804";
-      let res = neotp.totp.verify(token, key, { _t: 1111111109 * 1000 });
+      let res = await neotp.totp.verify(token, key, { _t: 1111111109 * 1000 });
       assert.ok(res, "Should pass");
     });
 
-    it("Vector at 2000000000", () => {
+    it("Vector at 2000000000", async () => {
       let token = "279037";
-      let res = neotp.totp.verify(token, key, { _t: 2000000000 * 1000 });
+      let res = await neotp.totp.verify(token, key, { _t: 2000000000 * 1000 });
       assert.ok(res, "Should pass");
     });
   });
@@ -159,33 +159,33 @@ describe("TOTP", () => {
   describe("Gen", () => {
     let key = "12345678901234567890";
 
-    it("Vector at 59s", () => {
+    it("Vector at 59s", async () => {
       assert.equal(
-        neotp.totp.gen(key, { _t: 59 * 1000 }),
+        await neotp.totp.gen(key, { _t: 59 * 1000 }),
         "287082",
         "TOTtoken values should match"
       );
     });
 
-    it("Vector at 1234567890", () => {
+    it("Vector at 1234567890", async () => {
       assert.equal(
-        neotp.totp.gen(key, { _t: 1234567890 * 1000 }),
+        await neotp.totp.gen(key, { _t: 1234567890 * 1000 }),
         "005924",
         "TOTtoken values should match"
       );
     });
 
-    it("Vector at 1111111109", () => {
+    it("Vector at 1111111109", async () => {
       assert.equal(
-        neotp.totp.gen(key, { _t: 1111111109 * 1000 }),
+        await neotp.totp.gen(key, { _t: 1111111109 * 1000 }),
         "081804",
         "TOTtoken values should match"
       );
     });
 
-    it("Vector at 2000000000", () => {
+    it("Vector at 2000000000", async () => {
       assert.equal(
-        neotp.totp.gen(key, { _t: 2000000000 * 1000 }),
+        await neotp.totp.gen(key, { _t: 2000000000 * 1000 }),
         "279037",
         "TOTtoken values should match"
       );
